@@ -154,6 +154,18 @@ if(DOWNLOAD_KOKKOS)
 elseif(EXTERNAL_KOKKOS)
   find_package(Kokkos 5.2.1 REQUIRED CONFIG)
   target_link_libraries(lammps PRIVATE Kokkos::kokkos)
+  # A Kokkos library built with Kokkos_ENABLE_COMPILE_AS_CMAKE_LANGUAGE compiles its sources with
+  # the CMake CUDA or HIP language instead of C++, and every source using it must be compiled
+  # with that language, too.  Since its usage requirements apply to all sources of the LAMMPS
+  # library, all of them are (see CMakeLists.txt), like with nvcc_wrapper or hipcc as C++ compiler.
+  if(Kokkos_COMPILE_LANGUAGE AND NOT Kokkos_COMPILE_LANGUAGE STREQUAL "CXX")
+    set(LAMMPS_KOKKOS_LANGUAGE ${Kokkos_COMPILE_LANGUAGE})
+    enable_language(${LAMMPS_KOKKOS_LANGUAGE})
+    # use the GPU architectures of Kokkos for the targets created before and after this point
+    set(CMAKE_${LAMMPS_KOKKOS_LANGUAGE}_ARCHITECTURES ${Kokkos_${LAMMPS_KOKKOS_LANGUAGE}_ARCHITECTURES})
+    set_target_properties(lammps lmp PROPERTIES
+      ${LAMMPS_KOKKOS_LANGUAGE}_ARCHITECTURES "${Kokkos_${LAMMPS_KOKKOS_LANGUAGE}_ARCHITECTURES}")
+  endif()
 else()
   set(LAMMPS_LIB_KOKKOS_SRC_DIR ${LAMMPS_LIB_SOURCE_DIR}/kokkos)
   set(LAMMPS_LIB_KOKKOS_BIN_DIR ${LAMMPS_LIB_BINARY_DIR}/kokkos)

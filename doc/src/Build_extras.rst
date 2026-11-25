@@ -892,6 +892,16 @@ This list was last updated for version 5.2.1 of the Kokkos library.
       platform-appropriate vendor library: rocFFT on AMD GPUs or cuFFT on
       NVIDIA GPUs.
 
+      With an external Kokkos library (``-D EXTERNAL_KOKKOS=on``) that
+      was built with ``-D Kokkos_ENABLE_COMPILE_AS_CMAKE_LANGUAGE=on``,
+      LAMMPS compiles all its sources with the CMake HIP (or CUDA)
+      language like Kokkos, for the GPU architecture Kokkos was built
+      for.  The C++ compiler then does not have to be ``hipcc`` (or
+      ``nvcc_wrapper``), and the HIP compiler can be selected with
+      ``-D CMAKE_HIP_COMPILER=/path/to/amdclang++``.  Compiler flags for
+      the LAMMPS sources must then be given in ``CMAKE_HIP_FLAGS``
+      instead of ``CMAKE_CXX_FLAGS``.
+
       For Intel GPUs using SYCL, set these variables:
 
       .. code-block:: bash
