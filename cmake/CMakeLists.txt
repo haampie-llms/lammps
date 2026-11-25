@@ -804,6 +804,14 @@ if((PKG_KOKKOS) AND (Kokkos_ENABLE_CUDA) AND ((LAMMPS_CXX_COMPILER_NAME STREQUAL
   endforeach()
 endif()
 
+# With an external Kokkos library compiled with the CMake CUDA or HIP language, all C++ sources
+# of LAMMPS are compiled with that language (see Packages/KOKKOS.cmake).
+if(LAMMPS_KOKKOS_LANGUAGE)
+  get_target_property(LAMMPS_ALL_SOURCES lammps SOURCES)
+  list(FILTER LAMMPS_ALL_SOURCES INCLUDE REGEX "\\.(cpp|cxx|cc)$")
+  set_source_files_properties(${LAMMPS_ALL_SOURCES} PROPERTIES LANGUAGE ${LAMMPS_KOKKOS_LANGUAGE})
+endif()
+
 ######################################
 # Generate lmpinstalledpkgs.h
 ######################################
